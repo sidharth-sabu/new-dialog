@@ -114,7 +114,7 @@ export const NewDialog: React.FC<NewDialogProps> = ({ onClose, onActionClick }) 
         <ActionList 
           onActionClick={handleActionClick} 
           searchMatches={matches}
-          isSearching={searchValue.length > 0}
+          isSearching={debouncedSearch.length > 0}
         />
       </div>
     </div>
