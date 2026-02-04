@@ -67,15 +67,6 @@ const actionPool: ActionItemData[] = [
   { id: 'create-folder-structure', label: 'Create folder structure', iconType: 'folder', category: 'organize' },
 ]
 
-// Show more is always included
-const showMoreItem: ActionItemData = {
-  id: 'show-more',
-  label: 'Show more',
-  iconType: 'more',
-  isSecondary: true,
-  category: 'other',
-}
-
 // Shuffle array using Fisher-Yates
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array]
@@ -108,9 +99,6 @@ export function getGroupedActions(): Map<ActionCategory, ActionItemData[]> {
     const shuffled = shuffleArray(items)
     grouped.set(cat, shuffled.slice(0, 3))
   })
-  
-  // Always add show more to other
-  grouped.set('other', [showMoreItem])
   
   return grouped
 }
