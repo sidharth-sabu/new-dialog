@@ -1,6 +1,11 @@
 import type { Metadata } from 'next'
+import dynamic from 'next/dynamic'
 import './globals.css'
-import { BranchSwitcher } from '@/components/BranchSwitcher'
+
+const BranchSwitcher = dynamic(
+  () => import('@/components/BranchSwitcher').then(mod => mod.BranchSwitcher),
+  { ssr: false }
+)
 
 export const metadata: Metadata = {
   title: 'Dovetail - New Dialog',
