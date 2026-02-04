@@ -4,7 +4,10 @@ import './globals.css'
 
 const BranchSwitcher = dynamic(
   () => import('@/components/BranchSwitcher').then(mod => mod.BranchSwitcher),
-  { ssr: false }
+  { 
+    ssr: false,
+    loading: () => null,
+  }
 )
 
 export const metadata: Metadata = {

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { ActionItem } from './ActionItem'
 import { ActionItemData, getGroupedActions, categoryLabels, categoryOrder, ActionCategory } from '@/lib/actions'
 import { MatchResult, getIconForTarget, getActionLabel } from '@/lib/knowledge'
@@ -27,12 +27,31 @@ export const ActionList: React.FC<ActionListProps> = ({
   searchMatches = [],
   isSearching = false
 }) => {
-  // Randomize only on client after mount to avoid hydration mismatch
+  // Track if component has mounted to avoid hydration mismatch
+  const [isMounted, setIsMounted] = useState(false)
   const [groupedActions, setGroupedActions] = useState<Map<ActionCategory, ActionItemData[]> | null>(null)
+  // Use ref to ensure we only generate actions once per mount
+  const actionsGeneratedRef = useRef(false)
   
   useEffect(() => {
-    setGroupedActions(getGroupedActions())
+    setIsMounted(true)
+    // Only generate actions once per mount to avoid inconsistencies
+    if (!actionsGeneratedRef.current) {
+      actionsGeneratedRef.current = true
+      setGroupedActions(getGroupedActions())
+    }
+    
+    // Reset ref on unmount so fresh actions are generated on next mount
+    return () => {
+      actionsGeneratedRef.current = false
+    }
   }, [])
+
+  // Show loading state until client-side mount to avoid hydration mismatch
+  // This ensures server and client initial render match (both render this placeholder)
+  if (!isMounted) {
+    return <div className="pb-4" />
+  }
 
   // Convert search matches to ActionItemData format (no descriptions)
   const matchedItems: ActionItemData[] = searchMatches.map((match, index) => ({
@@ -64,7 +83,7 @@ export const ActionList: React.FC<ActionListProps> = ({
     )
   }
 
-  // Show loading state until client-side randomization is ready
+  // Show loading state until randomization is ready
   if (!groupedActions) {
     return <div className="pb-4" />
   }

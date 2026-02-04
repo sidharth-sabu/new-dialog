@@ -45,15 +45,26 @@ const CheckIcon = () => (
 )
 
 export function BranchSwitcher() {
+  const [isMounted, setIsMounted] = useState(false)
   const [currentBranch, setCurrentBranch] = useState<string>('main')
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const fetchedRef = useRef(false)
+
+  // Mark as mounted on client
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   useEffect(() => {
-    fetchCurrentBranch()
-  }, [])
+    // Only fetch once per mount to avoid race conditions
+    if (isMounted && !fetchedRef.current) {
+      fetchedRef.current = true
+      fetchCurrentBranch()
+    }
+  }, [isMounted])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -68,6 +79,10 @@ export function BranchSwitcher() {
   const fetchCurrentBranch = async () => {
     try {
       const res = await fetch('/api/git/branch')
+      if (!res.ok) {
+        console.error('Failed to fetch branch:', res.status)
+        return
+      }
       const data = await res.json()
       if (data.branch) {
         // Only update if the branch is in our predefined list
@@ -82,11 +97,17 @@ export function BranchSwitcher() {
     }
   }
 
+  // Don't render until mounted to avoid hydration issues
+  if (!isMounted) {
+    return null
+  }
+
   const switchBranch = async (branchName: string) => {
     if (branchName === currentBranch || isLoading) return
 
     setIsLoading(true)
     setError(null)
+    setIsOpen(false) // Close dropdown immediately for better UX
 
     try {
       const res = await fetch('/api/git/checkout', {
@@ -98,17 +119,17 @@ export function BranchSwitcher() {
       const data = await res.json()
 
       if (data.success) {
-        setCurrentBranch(branchName)
-        setIsOpen(false)
-        // Reload the page to reflect the new branch's code
+        // Don't update state before reload - just reload immediately
+        // This avoids potential hydration issues from state changes before unmount
         window.location.reload()
+        return // Prevent any further state updates
       } else {
         setError(data.error || 'Failed to switch branch')
+        setIsLoading(false)
       }
     } catch (err) {
       setError('Failed to switch branch')
       console.error('Error switching branch:', err)
-    } finally {
       setIsLoading(false)
     }
   }
@@ -122,13 +143,25 @@ export function BranchSwitcher() {
     >
       {error && (
         <div 
-          className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-[#fafafa] text-[#0a0a0a] text-[13px] rounded-lg whitespace-nowrap"
+          className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-[#fafafa] text-[#0a0a0a] text-[13px] rounded-lg max-w-[280px]"
           style={{
             border: '1px solid rgba(10, 10, 10, 0.16)',
             boxShadow: '0px 8px 16px -4px rgba(10, 10, 10, 0.16)',
           }}
         >
-          {error}
+          <div className="font-medium text-red-600 mb-1">Cannot switch branch</div>
+          <div className="text-[12px] text-[#3b3b3b]">
+            {error.includes('local changes') 
+              ? 'You have uncommitted changes. Please commit or stash them first.'
+              : error.length > 100 ? error.slice(0, 100) + '...' : error
+            }
+          </div>
+          <button 
+            onClick={() => setError(null)}
+            className="mt-2 text-[11px] text-[#898989] hover:text-[#0a0a0a] underline"
+          >
+            Dismiss
+          </button>
         </div>
       )}
       
