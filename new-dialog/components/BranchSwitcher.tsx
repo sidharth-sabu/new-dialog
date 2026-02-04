@@ -45,7 +45,7 @@ const CheckIcon = () => (
 )
 
 export function BranchSwitcher() {
-  const [currentBranch, setCurrentBranch] = useState<string>('')
+  const [currentBranch, setCurrentBranch] = useState<string>('main')
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
