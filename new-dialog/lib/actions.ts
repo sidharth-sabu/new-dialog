@@ -52,10 +52,4 @@ export const actionItems: ActionItemData[] = [
     label: 'Organize with a folder',
     iconType: 'folder',
   },
-  {
-    id: 'show-more',
-    label: 'Show more',
-    iconType: 'more',
-    isSecondary: true,
-  },
 ]
