@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { BranchSwitcher } from '@/components/BranchSwitcher'
 
 export const metadata: Metadata = {
   title: 'Dovetail - New Dialog',
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        <BranchSwitcher />
+      </body>
     </html>
   )
 }
