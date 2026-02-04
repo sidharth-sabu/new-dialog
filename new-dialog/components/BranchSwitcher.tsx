@@ -7,6 +7,43 @@ const BRANCHES = [
   { name: 'empty_state_01', label: 'Empty State' },
 ]
 
+// Git branch icon matching the design style
+const BranchIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path 
+      d="M5 2.5V9.5M5 9.5C3.61929 9.5 2.5 10.6193 2.5 12C2.5 13.3807 3.61929 14.5 5 14.5C6.38071 14.5 7.5 13.3807 7.5 12C7.5 10.6193 6.38071 9.5 5 9.5ZM5 2.5C5 3.88071 3.88071 5 2.5 5M5 2.5C5 3.88071 6.11929 5 7.5 5M11 6.5V2.5M11 6.5C9.61929 6.5 8.5 7.61929 8.5 9C8.5 10.3807 9.61929 11.5 11 11.5C12.3807 11.5 13.5 10.3807 13.5 9C13.5 7.61929 12.3807 6.5 11 6.5ZM11 2.5C11 3.88071 9.88071 5 8.5 5M11 2.5C11 3.88071 12.1193 5 13.5 5" 
+      stroke="currentColor" 
+      strokeWidth="1.5" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+const ChevronIcon = ({ className }: { className?: string }) => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={className}>
+    <path 
+      d="M3 4.5L6 7.5L9 4.5" 
+      stroke="currentColor" 
+      strokeWidth="1.5" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+const CheckIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path 
+      d="M3.5 8.5L6.5 11.5L12.5 4.5" 
+      stroke="currentColor" 
+      strokeWidth="1.5" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
 export function BranchSwitcher() {
   const [currentBranch, setCurrentBranch] = useState<string>('')
   const [isOpen, setIsOpen] = useState(false)
@@ -79,7 +116,13 @@ export function BranchSwitcher() {
       className="fixed bottom-4 right-4 z-50"
     >
       {error && (
-        <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-red-500/90 text-white text-xs rounded-lg whitespace-nowrap">
+        <div 
+          className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-[#fafafa] text-[#0a0a0a] text-[13px] rounded-lg whitespace-nowrap"
+          style={{
+            border: '1px solid rgba(10, 10, 10, 0.16)',
+            boxShadow: '0px 8px 16px -4px rgba(10, 10, 10, 0.16)',
+          }}
+        >
           {error}
         </div>
       )}
@@ -88,57 +131,60 @@ export function BranchSwitcher() {
         <button
           onClick={() => setIsOpen(!isOpen)}
           disabled={isLoading}
-          className="flex items-center gap-2 px-3 py-2 bg-[#1a1a1a] border border-[#333] rounded-lg text-sm text-white/80 hover:bg-[#252525] hover:border-[#444] transition-all shadow-lg backdrop-blur-sm"
+          className="flex items-center gap-2 px-3 py-2 bg-[#fafafa] rounded-lg text-[14px] font-medium text-[#0a0a0a] hover:bg-[#ebebeb] transition-colors duration-150"
+          style={{
+            border: '1px solid rgba(10, 10, 10, 0.16)',
+            boxShadow: '0px 8px 16px -4px rgba(10, 10, 10, 0.24)',
+          }}
         >
-          <svg 
-            className="w-4 h-4 text-white/60" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M8 9l4-4 4 4m0 6l-4 4-4-4" 
-            />
-          </svg>
-          <span className="font-medium">{isLoading ? 'Switching...' : currentLabel}</span>
-          <svg 
-            className={`w-3 h-3 text-white/40 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <span className="text-[#898989]">
+            <BranchIcon />
+          </span>
+          <span>{isLoading ? 'Switching...' : currentLabel}</span>
+          <span className="text-[#898989]">
+            <ChevronIcon className={`transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`} />
+          </span>
         </button>
 
         {isOpen && (
-          <div className="absolute bottom-full right-0 mb-2 w-48 bg-[#1a1a1a] border border-[#333] rounded-lg shadow-xl overflow-hidden">
-            <div className="px-3 py-2 border-b border-[#333] text-xs text-white/40 uppercase tracking-wide">
+          <div 
+            className="absolute bottom-full right-0 mb-2 w-52 bg-[#fafafa] rounded-lg overflow-hidden"
+            style={{
+              border: '1px solid rgba(10, 10, 10, 0.16)',
+              boxShadow: '0px 16px 32px -8px rgba(10, 10, 10, 0.32)',
+            }}
+          >
+            <div 
+              className="px-4 py-2 text-[12px] font-medium text-[#898989] uppercase tracking-wider"
+              style={{ borderBottom: '1px solid rgba(10, 10, 10, 0.08)' }}
+            >
               Switch Branch
             </div>
-            {BRANCHES.map((branch) => (
-              <button
-                key={branch.name}
-                onClick={() => switchBranch(branch.name)}
-                disabled={isLoading}
-                className={`w-full px-3 py-2 text-left text-sm transition-colors flex items-center justify-between ${
-                  branch.name === currentBranch
-                    ? 'bg-[#252525] text-white'
-                    : 'text-white/70 hover:bg-[#222] hover:text-white'
-                }`}
-              >
-                <span>{branch.label}</span>
-                {branch.name === currentBranch && (
-                  <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-              </button>
-            ))}
-            <div className="px-3 py-2 border-t border-[#333] text-[10px] text-white/30">
+            <div className="py-1">
+              {BRANCHES.map((branch) => (
+                <button
+                  key={branch.name}
+                  onClick={() => switchBranch(branch.name)}
+                  disabled={isLoading}
+                  className={`w-full px-4 py-2 text-left text-[14px] font-medium transition-colors duration-150 flex items-center justify-between ${
+                    branch.name === currentBranch
+                      ? 'bg-[#ebebeb] text-[#0a0a0a]'
+                      : 'text-[#3b3b3b] hover:bg-[#ebebeb] hover:text-[#0a0a0a]'
+                  }`}
+                >
+                  <span>{branch.label}</span>
+                  {branch.name === currentBranch && (
+                    <span className="text-[#0a0a0a]">
+                      <CheckIcon />
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+            <div 
+              className="px-4 py-2 text-[11px] text-[#898989]"
+              style={{ borderTop: '1px solid rgba(10, 10, 10, 0.08)' }}
+            >
               Page will reload after switching
             </div>
           </div>
