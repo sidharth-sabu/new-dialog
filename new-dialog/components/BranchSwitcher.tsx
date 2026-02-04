@@ -142,9 +142,6 @@ export function BranchSwitcher() {
             boxShadow: '0px 8px 16px -4px rgba(10, 10, 10, 0.24)',
           }}
         >
-          <span className="text-[#898989]">
-            <BranchIcon />
-          </span>
           <span>{isLoading ? 'Switching...' : currentLabel}</span>
           <span className="text-[#898989]">
             <ChevronIcon className={`transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`} />
