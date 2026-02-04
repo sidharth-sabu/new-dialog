@@ -70,7 +70,12 @@ export function BranchSwitcher() {
       const res = await fetch('/api/git/branch')
       const data = await res.json()
       if (data.branch) {
-        setCurrentBranch(data.branch)
+        // Only update if the branch is in our predefined list
+        const isKnownBranch = BRANCHES.some(b => b.name === data.branch)
+        if (isKnownBranch) {
+          setCurrentBranch(data.branch)
+        }
+        // Otherwise keep default 'main'
       }
     } catch (err) {
       console.error('Failed to fetch branch:', err)
