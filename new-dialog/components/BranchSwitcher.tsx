@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 
 const BRANCHES = [
   { name: 'main', label: 'Main' },
-  { name: 'empty_state_01', label: 'Empty State' },
+  { name: 'empty_state_01', label: 'Empty State 01' },
+  { name: 'empty_state_02', label: 'Empty State 02' },
 ]
 
 // Git branch icon matching the design style
