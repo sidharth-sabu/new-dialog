@@ -6,7 +6,7 @@ import path from 'path'
 const execAsync = promisify(exec)
 
 // Allowed branches for security
-const ALLOWED_BRANCHES = ['main', 'empty_state_01', 'prototype_showcase', 'with_integration_logos']
+const ALLOWED_BRANCHES = ['main', 'empty_state_01', 'empty_state_02', 'prototype_showcase', 'with_integration_logos']
 
 export async function POST(request: Request) {
   try {
