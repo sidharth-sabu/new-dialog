@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { ActionItem } from './ActionItem'
-import { ActionItemData, getGroupedActions, categoryOrder, ActionCategory } from '@/lib/actions'
+import { ActionItemData, getGroupedActions, categoryOrder } from '@/lib/actions'
 import { MatchResult, getIconForTarget, getActionLabel } from '@/lib/knowledge'
 
 interface ActionListProps {
@@ -11,6 +11,9 @@ interface ActionListProps {
   isSearching?: boolean
 }
 
+const INITIAL_ITEMS = 8
+const LOAD_MORE_COUNT = 6
+
 export const ActionList: React.FC<ActionListProps> = ({ 
   onActionClick, 
   searchMatches = [],
@@ -18,11 +21,12 @@ export const ActionList: React.FC<ActionListProps> = ({
 }) => {
   // Track if component has mounted to avoid hydration mismatch
   const [isMounted, setIsMounted] = useState(false)
-  const [flatActions, setFlatActions] = useState<ActionItemData[]>([])
+  const [allActions, setAllActions] = useState<ActionItemData[]>([])
+  const [visibleCount, setVisibleCount] = useState(INITIAL_ITEMS)
   // Use ref to ensure we only generate actions once per mount
   const actionsGeneratedRef = useRef(false)
   
-  // Function to generate new randomized actions
+  // Function to generate randomized actions from all categories
   const generateActions = () => {
     const grouped = getGroupedActions()
     // Flatten the grouped actions into a single list (maintains category order)
@@ -31,7 +35,23 @@ export const ActionList: React.FC<ActionListProps> = ({
       const items = grouped.get(category) || []
       flat.push(...items)
     })
-    setFlatActions(flat)
+    return flat
+  }
+  
+  // Load more items - generates new random items and adds them
+  const handleLoadMore = () => {
+    const newItems = generateActions()
+    // Filter out items we already have (by id) and add new ones
+    const existingIds = new Set(allActions.map(a => a.id))
+    const uniqueNewItems = newItems.filter(item => !existingIds.has(item.id))
+    
+    if (uniqueNewItems.length > 0) {
+      setAllActions(prev => [...prev, ...uniqueNewItems])
+      setVisibleCount(prev => prev + LOAD_MORE_COUNT)
+    } else {
+      // If no new unique items, just show more of what we have
+      setVisibleCount(prev => Math.min(prev + LOAD_MORE_COUNT, allActions.length))
+    }
   }
   
   useEffect(() => {
@@ -39,7 +59,7 @@ export const ActionList: React.FC<ActionListProps> = ({
     // Only generate actions once per mount to avoid inconsistencies
     if (!actionsGeneratedRef.current) {
       actionsGeneratedRef.current = true
-      generateActions()
+      setAllActions(generateActions())
     }
     
     // Reset ref on unmount so fresh actions are generated on next mount
@@ -49,7 +69,6 @@ export const ActionList: React.FC<ActionListProps> = ({
   }, [])
 
   // Show loading state until client-side mount to avoid hydration mismatch
-  // This ensures server and client initial render match (both render this placeholder)
   if (!isMounted) {
     return <div className="p-4" />
   }
@@ -85,20 +104,32 @@ export const ActionList: React.FC<ActionListProps> = ({
   }
 
   // Show loading state until randomization is ready
-  if (flatActions.length === 0) {
+  if (allActions.length === 0) {
     return <div className="p-4" />
   }
 
-  // Flat list without category headers - refreshing the page shows new random items
+  const visibleActions = allActions.slice(0, visibleCount)
+  const hasMore = visibleCount < allActions.length || allActions.length >= INITIAL_ITEMS
+
+  // Flat list with "Load more" button
   return (
     <div className="p-4">
-      {flatActions.map((item) => (
+      {visibleActions.map((item) => (
         <ActionItem
           key={item.id}
           item={item}
           onClick={() => onActionClick?.(item.id)}
         />
       ))}
+      
+      {hasMore && (
+        <button
+          onClick={handleLoadMore}
+          className="w-full py-3 text-center text-[14px] font-medium text-[#898989] hover:text-[#3b3b3b] transition-colors duration-150"
+        >
+          Load more
+        </button>
+      )}
     </div>
   )
 }
