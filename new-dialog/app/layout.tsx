@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import './globals.css'
 
-const BranchSwitcher = dynamic(
-  () => import('@/components/BranchSwitcher').then(mod => mod.BranchSwitcher),
-  { ssr: false }
+const VariantClientWrapper = dynamic(
+  () => import('@/components/VariantClientWrapper').then(mod => mod.VariantClientWrapper),
+  { ssr: false, loading: () => null }
 )
 
 export const metadata: Metadata = {
@@ -20,8 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased" suppressHydrationWarning>
-        {children}
-        <BranchSwitcher />
+        <VariantClientWrapper>
+          {children}
+        </VariantClientWrapper>
       </body>
     </html>
   )
